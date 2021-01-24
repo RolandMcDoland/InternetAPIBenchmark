@@ -1,11 +1,21 @@
 package com.rolandVoxes.internetAPIBenchmark.model;
 
+import java.util.ArrayList;
+
 public class MockModel {
     String url;
-    float duration;
+    ArrayList<Float>avgDurations;
 
-    public MockModel(String url, float duration) {
+    public MockModel(String url) {
         this.url = url;
-        this.duration = duration;
+        avgDurations = new ArrayList<>();
+    }
+
+    public void addAvgDuration(float avgDuration) {
+        avgDurations.add(avgDuration);
+    }
+
+    public String getUrl() {
+        return url;
     }
 }
