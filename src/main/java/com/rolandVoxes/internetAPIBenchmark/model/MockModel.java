@@ -18,4 +18,6 @@ public class MockModel {
     public String getUrl() {
         return url;
     }
+
+    public ArrayList<Float> getAvgDurations() { return avgDurations; }
 }

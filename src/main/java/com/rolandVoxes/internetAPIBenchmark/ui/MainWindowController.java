@@ -11,7 +11,12 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.ScatterChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 
 import java.lang.reflect.Type;
 import java.net.URL;
@@ -21,14 +26,18 @@ import java.util.ResourceBundle;
 
 public class MainWindowController implements Initializable {
 
+    private ArrayList<MockModel> historyResultList;
+
     @FXML public TabPane appTabPane;
 
     @FXML public TextField urlRequestText;
     @FXML public TextField countRequestText;
     @FXML public Button startBenchmarkButton;
     @FXML public TextArea resultTextArea;
+    @FXML public VBox boxForCurrentChart;
 
     @FXML public ListView<String> historyResultsListView;
+    @FXML public VBox boxForHistoryChart;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -52,9 +61,11 @@ public class MainWindowController implements Initializable {
         ArrayList<MockModel> mockModelList = loadList();
         System.out.println(mockModelList);
 
-        float durationSum = makeRequests(countText, urlText);
+        ArrayList<Float> durationList = makeRequests(countText, urlText);
 
-        saveList(mockModelList, urlText, countText, durationSum);
+        createAndInsertChart(durationList, boxForCurrentChart);
+
+        saveList(mockModelList, urlText, countText, durationList.stream().reduce(0.0f, Float::sum));
     }
 
     void refreshHistory() {
@@ -63,6 +74,7 @@ public class MainWindowController implements Initializable {
         try {
             Type listType = new TypeToken<ArrayList<MockModel>>(){}.getType();
             mockModelList = JsonController.load("data.json", listType);
+            historyResultList = mockModelList;
             System.out.println(mockModelList);
         } catch(Exception e) {
             return;
@@ -100,10 +112,11 @@ public class MainWindowController implements Initializable {
         JsonController.save(mockModelList, "data.json");
     }
 
-    float makeRequests(String countText, String urlText) {
+    ArrayList<Float> makeRequests(String countText, String urlText) {
         RequestController requestController = new RequestController();
         TimerController timerController = new TimerController();
 
+        ArrayList<Float> durationList = new ArrayList<>();
         float durationSum = 0;
 
         for (int i = 0; i < Integer.parseInt(countText); i++) {
@@ -111,6 +124,7 @@ public class MainWindowController implements Initializable {
             requestController.sendRequest(urlText);
             timerController.stopTimer();
             float duration = timerController.getDuration();
+            durationList.add(duration);
             System.out.println(duration);
 
             resultTextArea.setText(resultTextArea.getText() + "\n" + String.valueOf(duration));
@@ -119,6 +133,33 @@ public class MainWindowController implements Initializable {
             durationSum += duration;
         }
 
-        return durationSum;
+        return durationList;
+    }
+
+    @FXML
+    void historyResultsListViewSelected() {
+        int idx = historyResultsListView.getSelectionModel().getSelectedIndex();
+        if(idx >= 0) {
+            ArrayList<Float> durationList = historyResultList.get(idx).getAvgDurations();
+
+            createAndInsertChart(durationList, boxForHistoryChart);
+        }
+    }
+
+    void createAndInsertChart(ArrayList<Float> list, VBox box) {
+        NumberAxis xAxis = new NumberAxis();
+        xAxis.setLabel("Test number");
+        NumberAxis yAxis = new NumberAxis();
+        yAxis.setLabel("Time [s]");
+        ScatterChart<Number, Number> historyScatterChart = new ScatterChart<>(xAxis, yAxis);
+        historyScatterChart.setLegendVisible(false);
+        XYChart.Series series1 = new XYChart.Series();
+        for(int i = 0; i < list.size(); i++) {
+            series1.getData().add(new XYChart.Data(Integer.valueOf(i+1), list.get(i)));
+        }
+
+        historyScatterChart.getData().addAll(series1);
+        box.getChildren().clear();
+        box.getChildren().add(historyScatterChart);
     }
 }
