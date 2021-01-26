@@ -71,9 +71,8 @@ public class MainWindowController implements Initializable {
         HashMap<String, String> headerMap = getHeaderOptionsMap();
 
         String bodyText = bodyRequestText.getText().trim();
-        // TODO wykorzystac headerMap i bodyText
 
-        ArrayList<Float> durationList = makeRequests(countText, urlText);
+        ArrayList<Float> durationList = makeRequests(countText, urlText, headerMap, bodyText);
 
         createAndInsertChart(durationList, boxForCurrentChart);
 
@@ -124,7 +123,7 @@ public class MainWindowController implements Initializable {
         JsonController.save(mockModelList, "data.json");
     }
 
-    ArrayList<Float> makeRequests(String countText, String urlText) {
+    ArrayList<Float> makeRequests(String countText, String urlText, Map<String, String> headers, String body) {
         RequestController requestController = new RequestController();
         TimerController timerController = new TimerController();
 
@@ -133,13 +132,17 @@ public class MainWindowController implements Initializable {
 
         for (int i = 0; i < Integer.parseInt(countText); i++) {
             timerController.startTimer();
-            requestController.sendRequest(urlText);
+            int responseCode;
+            if (body.isEmpty())
+                responseCode = requestController.sendRequest(urlText, headers);
+            else
+                responseCode = requestController.sendRequest(urlText, headers, body);
             timerController.stopTimer();
             float duration = timerController.getDuration();
             durationList.add(duration);
             System.out.println(duration);
 
-            resultTextArea.setText(resultTextArea.getText() + "\n" + String.valueOf(duration));
+            resultTextArea.setText(resultTextArea.getText() + "\n" + duration + "s\t" + responseCode);
             System.out.println("Wykonano polaczenie");
 
             durationSum += duration;
