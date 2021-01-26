@@ -15,7 +15,7 @@ public class Main extends Application {
 
         Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("./MainWindow.fxml"));
         primaryStage.setTitle("APIBenchmark");
-        primaryStage.setScene(new Scene(root, 600, 400));
+        primaryStage.setScene(new Scene(root, 600, 600));
         primaryStage.setMinWidth(400);
         primaryStage.setMinHeight(400);
         //primaryStage.setResizable(false);

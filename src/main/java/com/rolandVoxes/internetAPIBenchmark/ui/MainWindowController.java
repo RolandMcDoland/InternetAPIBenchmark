@@ -11,16 +11,21 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.ScatterChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 
@@ -32,8 +37,10 @@ public class MainWindowController implements Initializable {
 
     @FXML public TextField urlRequestText;
     @FXML public TextField countRequestText;
+    @FXML public TextArea bodyRequestText;
     @FXML public Button startBenchmarkButton;
     @FXML public TextArea resultTextArea;
+    @FXML public VBox headersContainerVBox;
     @FXML public VBox boxForCurrentChart;
 
     @FXML public ListView<String> historyResultsListView;
@@ -60,6 +67,11 @@ public class MainWindowController implements Initializable {
 //      String url = "https://api.chucknorris.io/jokes/random";
         ArrayList<MockModel> mockModelList = loadList();
         System.out.println(mockModelList);
+
+        HashMap<String, String> headerMap = getHeaderOptionsMap();
+
+        String bodyText = bodyRequestText.getText().trim();
+        // TODO wykorzystac headerMap i bodyText
 
         ArrayList<Float> durationList = makeRequests(countText, urlText);
 
@@ -161,5 +173,60 @@ public class MainWindowController implements Initializable {
         historyScatterChart.getData().addAll(series1);
         box.getChildren().clear();
         box.getChildren().add(historyScatterChart);
+    }
+
+    @FXML
+    void addHeaderButtonPressed(ActionEvent action) {
+        headersContainerVBox.getChildren().add(createBoxForHeader());
+    }
+
+    @FXML
+    void deleteHeaderButtonPressed(ActionEvent action) {
+        int size = headersContainerVBox.getChildren().size();
+        if(size > 0) {
+            headersContainerVBox.getChildren().remove(size-1);
+        }
+    }
+
+    HBox createBoxForHeader() {
+        Label optionL = new Label("Option:");
+        TextField optionT = new TextField();
+        HBox.setHgrow(optionT, Priority.ALWAYS);
+        optionT.setId("headerOptionTextField");
+        Label valueL = new Label("Value:");
+        TextField valueT = new TextField();
+        HBox.setHgrow(valueT, Priority.ALWAYS);
+        valueT.setId("headerValueTextField");
+
+        HBox box = new HBox(optionL, optionT, valueL, valueT);
+        box.setAlignment(Pos.CENTER_LEFT);
+        box.setSpacing(8.0);
+
+        return box;
+    }
+
+    HashMap<String, String> getHeaderOptionsMap() {
+        var childrenList = headersContainerVBox.getChildren();
+        HashMap<String, String> map = new HashMap<>();
+
+        for(var hbox: childrenList) {
+            if(hbox instanceof HBox) {
+                HBox children = (HBox)hbox;
+                String option = "";
+                String value = "";
+                for(var child: children.getChildren()) {
+                    if(child instanceof TextField) {
+                        TextField tf = (TextField)child;
+                        if(tf.getId().equals("headerOptionTextField")) option = tf.getText();
+                        else if(tf.getId().equals("headerValueTextField")) value = tf.getText();
+                    }
+                }
+                if(!option.trim().isEmpty() && !value.trim().isEmpty()) {
+                    map.put(option, value);
+                }
+            }
+        }
+
+        return map;
     }
 }

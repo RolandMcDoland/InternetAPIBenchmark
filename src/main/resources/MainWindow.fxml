@@ -19,7 +19,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<GridPane alignment="center" hgap="10" prefHeight="400.0" prefWidth="600.0" vgap="10" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.rolandVoxes.internetAPIBenchmark.ui.MainWindowController">
+<GridPane alignment="center" hgap="10" prefHeight="600.0" prefWidth="600.0" vgap="10" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.rolandVoxes.internetAPIBenchmark.ui.MainWindowController">
 <columnConstraints>
     <ColumnConstraints />
 </columnConstraints>
@@ -31,11 +31,11 @@
         <tabs>
             <Tab fx:id="newTestPane" text="New test">
                 <content>
-                    <SplitPane dividerPositions="0.42207792207792205" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
+                    <SplitPane dividerPositions="0.5582865168539326" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
                         <items>
                             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="118.0" prefWidth="600.0">
                                 <children>
-                                    <VBox prefHeight="218.0" prefWidth="600.0" spacing="5.0">
+                                    <VBox prefHeight="218.0" prefWidth="600.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                         <children>
                                             <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="579.0">
                                                 <children>
@@ -57,6 +57,16 @@
                                                     <TextField fx:id="countRequestText" HBox.hgrow="ALWAYS" />
                                                 </children>
                                             </HBox>
+                                    <HBox alignment="CENTER_LEFT" spacing="5.0">
+                                       <children>
+                                          <Label text="Headers" />
+                                          <Button fx:id="addHeaderButton" mnemonicParsing="false" onAction="#addHeaderButtonPressed" text="+" />
+                                          <Button fx:id="deleteHeaderButton" mnemonicParsing="false" onAction="#deleteHeaderButtonPressed" text="-" />
+                                       </children>
+                                    </HBox>
+                                    <VBox fx:id="headersContainerVBox" spacing="3.0" />
+                                    <Label text="Body" />
+                                    <TextArea fx:id="bodyRequestText" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
                                             <Button fx:id="startBenchmarkButton" mnemonicParsing="false" onAction="#startBenchmark" text="Start" />
                                         </children>
                                         <padding>
